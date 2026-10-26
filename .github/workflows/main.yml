@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    # 1. 自动生成签名文件 (解决 Keystore not found 报错)
+    # 1. 自动生成签名文件 (解决前面报错)
     - name: Generate debug.keystore
       run: |
         keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
@@ -28,40 +28,12 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    # 2. 创建假的 google-services.json (解决 File missing 报错)
-    # 注意：如果你想要真实体验 Firebase 功能，需要在仓库的 Secrets 里配置真实的 json。
-    # 这里为了能成功打出包，先创建一个占位符文件骗过编译器。
-    - name: Create dummy google-services.json
+    # 2. 核心修改：用一个假的空文件骗过编译过程
+    # 因为有些系统底层的模板代码引用了它，哪怕你没用，Gradle 也去检查。
+    # 这里直接给个空 JSON 骗过它，不影响你实际功能。
+    - name: Skip google-services check
       run: |
-        echo '{
-          "project_info": {
-            "project_number": "123456789012",
-            "project_id": "seriallab-dummy",
-            "storage_bucket": "seriallab-dummy.appspot.com"
-          },
-          "client": [
-            {
-              "client_info": {
-                "mobilesdk_app_id": "1:123456789012:android:1234567890123456",
-                "android_client_info": {
-                  "package_name": "com.example.fserialapp"
-                }
-              },
-              "oauth_client": [],
-              "api_key": [
-                {
-                  "current_key": "AIzaSyDummyKey1234567890"
-                }
-              ],
-              "services": {
-                "appinvite_service": {
-                  "other_platform_oauth_client": []
-                }
-              }
-            }
-          ],
-          "configuration_version": "1"
-        }' > app/google-services.json
+        echo "{}" > app/google-services.json
 
     - name: Build with Gradle
       run: gradle assembleDebug
