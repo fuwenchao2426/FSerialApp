@@ -1,0 +1,6 @@
+{
+  "name": "SerialLab",
+  "description": "Professional Android USB-OTG serial assistant and real-time multi-channel oscilloscope with dynamic protocol decoding and formula calculation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
